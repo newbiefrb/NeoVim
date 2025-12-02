@@ -131,7 +131,57 @@ require("lazy").setup({
     end,
   },
 })
+-- === MASON + LSP SETUP (paste after your lazy.setup) ===
+-- make sure these plugins are present in your lazy.setup plugins table:
+-- "williamboman/mason.nvim"
+-- "williamboman/mason-lspconfig.nvim"
+-- "neovim/nvim-lspconfig"
 
+-- require and configure mason
+require("mason").setup()
+require("mason-lspconfig").setup({
+  ensure_installed = { "yamlls", "ansiblels" }, -- ensure these are available
+  automatic_installation = true,
+})
+
+local lspconfig = require("lspconfig")
+
+-- Common on_attach to enable keymaps when LSP attaches
+local on_attach = function(client, bufnr)
+  local opts = { buffer = bufnr, silent = true }
+  vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+  vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+  vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+  vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+end
+
+-- YAML language server (yaml-language-server)
+lspconfig.yamlls.setup({
+  on_attach = on_attach,
+  settings = {
+    yaml = {
+      schemaStore = { enable = true }, -- use schemastore for common schema lookup
+      validate = true,
+      hover = true,
+      completion = true,
+      schemas = {
+        -- optional: explicit mapping for Ansible playbooks (uncomment if you want)
+        -- ["https://json.schemastore.org/ansible-stable-2.9.json"] = { "playbook*.yml", "*/tasks/*.yml", "**/playbook.yml" },
+      },
+    },
+  },
+})
+
+-- Ansible language server (ansible-ls)
+-- Note: ansiblels provides ansible-specific completions/diagnostics
+lspconfig.ansiblels.setup({
+  on_attach = on_attach,
+  settings = {
+    ansible = {
+      python = "auto", -- let it discover interpreter; set path if needed
+    },
+  },
+})
 -----------------------------
 -- Keymaps
 -----------------------------
