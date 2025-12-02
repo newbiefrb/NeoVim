@@ -1,0 +1,17 @@
+# yaml-language-server
+npm install -g yaml-language-server
+
+# ansible language server (official)
+npm install -g @ansible/ansible-language-server
+
+How to confirm LSP is running / debugging tips
+:LspInfo — shows installed/attached LSP clients for current buffer. If yamlls or ansiblels is not in the attached list, client didn’t start.
+:checkhealth — general Neovim health checks (can show issues).
+Diagnostics quick check:
+:lua vim.diagnostic.open_float() — show diagnostics at cursor
+:lua print(vim.inspect(vim.diagnostic.get(0))) — print diagnostics table for buffer
+LSP logs: :lua print(vim.lsp.get_log_path()) then open the printed log file to inspect startup errors.
+Common causes if LSP not attached:
+server binary not found (install it)
+filetype not recognized (check :set ft? — should be yaml or ansible)
+mason not installed or automatic_installation off
